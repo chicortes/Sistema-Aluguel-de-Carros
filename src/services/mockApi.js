@@ -1,14 +1,17 @@
 // Back-end simulado no navegador (localStorage). Ativado com VITE_USE_MOCK=true.
 // Segue o mesmo contrato da API REST, então trocar para o Spring Boot não muda as telas.
 const DB_KEY = 'vaptvupt:mockdb'
+// Aumente este número sempre que mudar os dados iniciais: o navegador descarta
+// o banco simulado antigo e cria um novo, sem precisar limpar o localStorage.
+const VERSAO_DADOS = 2
 const delay = (ms = 250) => new Promise((r) => setTimeout(r, ms))
 
 const seed = () => ({
+  versao: VERSAO_DADOS,
   usuarios: [
-    { id: 1, tipo: 'AGENTE', tipoAgente: 'BANCO', nome: 'Banco Horizonte', login: 'banco', senha: '123' },
-    { id: 2, tipo: 'AGENTE', tipoAgente: 'EMPRESA', nome: 'Locadora Serra Azul', login: 'empresa', senha: '123' },
+    { id: 1, tipo: 'AGENTE', tipoAgente: 'BANCO', nome: 'Agente', login: 'agente', senha: '123' },
     {
-      id: 3, tipo: 'CLIENTE', nome: 'Ana Souza', login: 'ana', senha: '123',
+      id: 3, tipo: 'CLIENTE', nome: 'Ana Souza', login: 'cliente', senha: '123',
       rg: 'MG-12.345.678', cpf: '123.456.789-00', endereco: 'Rua da Bahia, 1000 - Belo Horizonte',
       profissao: 'Engenheira',
       empregadores: [{ nome: 'Construtora Minas', rendimento: 8500 }],
@@ -24,7 +27,10 @@ const seed = () => ({
   nextId: 100,
 })
 
-const load = () => JSON.parse(localStorage.getItem(DB_KEY)) || seed()
+const load = () => {
+  const db = JSON.parse(localStorage.getItem(DB_KEY))
+  return db?.versao === VERSAO_DADOS ? db : seed()
+}
 const save = (db) => localStorage.setItem(DB_KEY, JSON.stringify(db))
 const semSenha = ({ senha, ...u }) => u
 const sessaoAtual = (db) => {
