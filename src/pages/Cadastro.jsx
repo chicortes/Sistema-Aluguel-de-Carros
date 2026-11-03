@@ -1,6 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom'
 import ClienteForm from '../components/ClienteForm'
-import Placa from '../components/Placa'
+import Logo from '../components/Logo'
 import { clienteService } from '../services/clienteService'
 import { useAuth } from '../contexts/AuthContext'
 
@@ -17,7 +17,7 @@ export default function Cadastro() {
   return (
     <div className="pagina-solta">
       <header className="pagina-solta__topo">
-        <Link to="/login"><Placa tamanho="sm" /></Link>
+        <Link to="/login"><Logo variante="claro" tamanho="sm" /></Link>
         <Link to="/login" className="btn btn--fantasma">Já tenho conta</Link>
       </header>
       <main className="pagina-solta__corpo">

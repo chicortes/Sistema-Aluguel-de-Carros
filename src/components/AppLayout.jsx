@@ -1,6 +1,6 @@
 import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
-import Placa from './Placa'
+import Logo from './Logo'
 
 export default function AppLayout() {
   const { usuario, sair } = useAuth()
@@ -17,7 +17,7 @@ export default function AppLayout() {
       <header className="topo">
         <div className="topo__conteudo">
           <NavLink to="/" className="topo__marca">
-            <Placa tamanho="sm" />
+            <Logo variante="claro" tamanho="sm" />
           </NavLink>
 
           <nav className="topo__nav">
@@ -33,10 +33,7 @@ export default function AppLayout() {
           </nav>
 
           <div className="topo__usuario">
-            <span>
-              {usuario.nome}
-              {ehAgente && <small> {usuario.tipoAgente === 'BANCO' ? 'Banco' : 'Empresa'}</small>}
-            </span>
+            <span>{usuario.nome}</span>
             <button className="btn btn--fantasma" onClick={handleSair}>Sair</button>
           </div>
         </div>

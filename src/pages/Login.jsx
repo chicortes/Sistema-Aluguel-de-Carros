@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
-import Placa from '../components/Placa'
+import Logo from '../components/Logo'
 import Campo from '../components/Campo'
 import { USE_MOCK } from '../services/api'
 
@@ -34,7 +34,7 @@ export default function Login() {
   return (
     <div className="entrada">
       <section className="entrada__estrada" aria-hidden="true">
-        <Placa tamanho="lg" />
+        <Logo variante="claro" tamanho="lg" />
         <p className="entrada__slogan">Peça seu carro, acompanhe a análise e assine o contrato sem sair de casa.</p>
         <div className="faixa" />
       </section>
@@ -63,9 +63,8 @@ export default function Login() {
             <div className="caixa-demo">
               <strong>Modo demonstração</strong>
               <ul>
-                <li>Cliente: <code>ana</code> / <code>123</code></li>
-                <li>Banco: <code>banco</code> / <code>123</code></li>
-                <li>Empresa: <code>empresa</code> / <code>123</code></li>
+                <li>Cliente: <code>cliente</code> / <code>123</code></li>
+                <li>Agente: <code>agente</code> / <code>123</code></li>
               </ul>
             </div>
           )}
