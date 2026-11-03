@@ -1,7 +1,7 @@
-// Logotipo no formato de placa Mercosul.
-export default function Placa({ texto = 'VAPTVUPT', tamanho = 'md' }) {
+// Placa Mercosul do carro (usada na escolha do automóvel).
+export default function Placa({ texto, tamanho = 'xs' }) {
   return (
-    <span className={`placa placa--${tamanho}`} aria-label="VaptVupt">
+    <span className={`placa placa--${tamanho}`} aria-label={`Placa ${texto}`}>
       <span className="placa__faixa">
         <span>BRASIL</span>
       </span>
