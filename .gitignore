@@ -1,6 +1,11 @@
-node_modules
-dist
+node_modules/
+target/
+dist/
 .env
 .env.local
-*.log
+.idea/
+.vscode/
+*.iml
 .DS_Store
+Thumbs.db
+*.log
