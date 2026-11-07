@@ -8,7 +8,6 @@ export function AuthProvider({ children }) {
   const [usuario, setUsuario] = useState(null)
   const [carregando, setCarregando] = useState(true)
 
-  // Ao abrir o app, recupera a sessão se ainda houver token salvo.
   useEffect(() => {
     if (!tokenStorage.get()) {
       setCarregando(false)

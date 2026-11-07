@@ -8,7 +8,7 @@ import { diasEntre } from '../utils/formatos'
 
 const hoje = () => new Date().toISOString().slice(0, 10)
 
-// Serve para criar e para alterar um pedido (rota /pedidos/:id/editar).
+// Serve para criar e para alterar um pedido
 export default function NovoPedido() {
   const { id } = useParams()
   const editando = Boolean(id)

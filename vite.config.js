@@ -1,9 +1,13 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
-// Em desenvolvimento, chamadas para /api são repassadas ao back-end Spring Boot.
 export default defineConfig({
   plugins: [react()],
+  build: {
+    outDir: 'target/classes/static',
+    emptyOutDir: true,
+  },
+
   server: {
     port: 5173,
     proxy: {
@@ -11,6 +15,9 @@ export default defineConfig({
         target: 'http://localhost:8080',
         changeOrigin: true,
       },
+    },
+    watch: {
+      ignored: ['**/target/**', '**/src/main/java/**'],
     },
   },
 })

@@ -1,8 +1,5 @@
-// Back-end simulado no navegador (localStorage). Ativado com VITE_USE_MOCK=true.
-// Segue o mesmo contrato da API REST, então trocar para o Spring Boot não muda as telas.
 const DB_KEY = 'vaptvupt:mockdb'
-// Aumente este número sempre que mudar os dados iniciais: o navegador descarta
-// o banco simulado antigo e cria um novo, sem precisar limpar o localStorage.
+
 const VERSAO_DADOS = 2
 const delay = (ms = 250) => new Promise((r) => setTimeout(r, ms))
 

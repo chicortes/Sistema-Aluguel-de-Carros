@@ -1,5 +1,3 @@
-// Cliente HTTP único da aplicação. Todas as chamadas ao back-end passam por aqui.
-// Sem .env o app roda em modo demonstração; use VITE_USE_MOCK=false para falar com o Spring Boot.
 export const USE_MOCK = import.meta.env.VITE_USE_MOCK !== 'false'
 
 const BASE_URL = '/api'
