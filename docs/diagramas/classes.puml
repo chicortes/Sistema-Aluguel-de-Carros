@@ -1,0 +1,115 @@
+@startuml classes
+!include estilo.iuml
+skinparam classAttributeIconSize 0
+hide empty members
+title VaptVupt - Diagrama de Classes (modelo de domínio)
+
+abstract class Usuario {
+  - id : Long
+  - nome : String
+  - login : String
+  - senha : String
+  + {abstract} getTipo() : TipoUsuario
+}
+
+class Cliente {
+  - rg : String
+  - cpf : String
+  - endereco : String
+  - profissao : String
+  + setRendimentos(rendimentos : List<Rendimento>)
+}
+
+class Rendimento <<embeddable>> {
+  - entidadeEmpregadora : String
+  - valor : BigDecimal
+}
+
+class Agente {
+  - tipoAgente : TipoAgente
+  + isBanco() : boolean
+}
+
+class Automovel {
+  - id : Long
+  - matricula : String
+  - ano : int
+  - marca : String
+  - modelo : String
+  - placa : String
+}
+
+class Pedido {
+  - id : Long
+  - dataInicio : LocalDate
+  - dataFim : LocalDate
+  - observacao : String
+  - status : StatusPedido
+  - criadoEm : Instant
+  - parecer : Parecer
+  - comentarioParecer : String
+  - avaliadoEm : Instant
+  + pertenceA(clienteId : Long) : boolean
+  + alterar(automovel, dataInicio, dataFim, observacao)
+  + cancelar()
+  + avaliar(agente : Agente, parecer : Parecer, comentario : String)
+  + executarContrato(agente : Agente, proprietario : TipoProprietario, credito : ContratoCredito)
+}
+
+class Contrato {
+  - id : Long
+  - proprietario : TipoProprietario
+  - assinadoEm : Instant
+}
+
+class ContratoCredito {
+  - id : Long
+  - concedidoEm : Instant
+}
+
+enum TipoUsuario {
+  CLIENTE
+  AGENTE
+}
+
+enum TipoAgente {
+  EMPRESA
+  BANCO
+}
+
+enum StatusPedido {
+  PENDENTE
+  APROVADO
+  REPROVADO
+  CANCELADO
+  CONTRATADO
+}
+
+enum Parecer {
+  POSITIVO
+  NEGATIVO
+}
+
+enum TipoProprietario {
+  CLIENTE
+  EMPRESA
+  BANCO
+}
+
+Usuario <|-- Cliente
+Usuario <|-- Agente
+Cliente "1" *-- "0..3" Rendimento : rendimentos >
+Cliente "1" -- "0..*" Pedido : faz >
+Pedido "0..*" --> "1" Automovel : aluga >
+Pedido "0..*" --> "0..1" Agente : avaliado por >
+Pedido "1" -- "0..1" Contrato : gera >
+Contrato "0..*" --> "1" Agente : executado por >
+Contrato "1" *-- "0..1" ContratoCredito
+ContratoCredito "0..*" --> "1" Agente : concedido pelo banco >
+
+Usuario ..> TipoUsuario
+Agente ..> TipoAgente
+Pedido ..> StatusPedido
+Pedido ..> Parecer
+Contrato ..> TipoProprietario
+@enduml

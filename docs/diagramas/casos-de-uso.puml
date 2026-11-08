@@ -1,0 +1,47 @@
+@startuml casos-de-uso
+!include estilo.iuml
+left to right direction
+title VaptVupt - Diagrama de Casos de Uso
+
+actor "Cliente" as Cliente
+actor "Agente" as Agente
+actor "Empresa" as Empresa
+actor "Banco" as Banco
+
+rectangle "Sistema de Aluguel de Carros" {
+  usecase "UC01 Fazer login" as UC01
+  usecase "UC02 Cadastrar-se" as UC02
+  usecase "UC03 Consultar, alterar e\nexcluir dados cadastrais" as UC03
+  usecase "UC04 Introduzir pedido\nde aluguel" as UC04
+  usecase "UC05 Consultar pedidos\ne seu status" as UC05
+  usecase "UC07 Cancelar pedido" as UC07
+  usecase "UC06 Modificar pedido" as UC06
+  usecase "UC08 Avaliar pedido\n(análise financeira)" as UC08
+  usecase "UC09 Executar contrato" as UC09
+  usecase "UC10 Conceder contrato\nde crédito" as UC10
+}
+
+Cliente --> UC02
+Cliente --> UC01
+Cliente --> UC03
+Cliente --> UC04
+Cliente --> UC05
+Cliente --> UC07
+Cliente --> UC06
+
+UC01 <-- Agente
+UC06 <-- Agente
+UC08 <-- Agente
+UC09 <-- Agente
+UC10 <-- Banco
+
+Agente <|-- Empresa
+Agente <|-- Banco
+
+UC09 <.. UC10 : <<extend>>
+
+note bottom of UC01
+  Todos os casos de uso, exceto UC02,
+  só podem ser usados após o login.
+end note
+@enduml
