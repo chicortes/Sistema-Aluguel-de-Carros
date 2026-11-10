@@ -51,8 +51,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/pedidos").hasAuthority(AGENTE)
                         .requestMatchers(HttpMethod.PATCH, "/api/pedidos/*/avaliar").hasAuthority(AGENTE)
                         .requestMatchers(HttpMethod.POST, "/api/pedidos/*/contrato").hasAuthority(AGENTE)
-                        .requestMatchers("/api/**").authenticated()
-                        .anyRequest().permitAll())
+                        .anyRequest().authenticated())
                 .oauth2ResourceServer(oauth -> oauth
                         .jwt(Customizer.withDefaults())
                         .authenticationEntryPoint(naoAutenticado)

@@ -2,38 +2,35 @@
 !include estilo.iuml
 title VaptVupt - Diagrama de Pacotes (Visão Lógica)
 
-package "VaptVupt — projeto Spring Boot único" as APP {
-
-  package "src/main/frontend (React + Vite) — View" as FE {
-    package pages {
-    }
-    package components {
-    }
-    package contexts {
-    }
-    package services {
-    }
-    package utils {
-    }
-    package assets {
-    }
+package "frontend (React + Vite) — View" as FE {
+  package pages {
   }
+  package components {
+  }
+  package contexts {
+  }
+  package services {
+  }
+  package utils {
+  }
+  package assets {
+  }
+}
 
-  package "src/main/java — com.vaptvupt" as BE {
-    package controller {
-    }
-    package dto {
-    }
-    package service {
-    }
-    package model {
-    }
-    package repository {
-    }
-    package config {
-    }
-    package exception {
-    }
+package "backend (Spring Boot) — com.vaptvupt" as BE {
+  package controller {
+  }
+  package dto {
+  }
+  package service {
+  }
+  package model {
+  }
+  package repository {
+  }
+  package config {
+  }
+  package exception {
   }
 }
 
@@ -49,7 +46,6 @@ components ..> assets
 contexts ..> services
 
 services ..> controller : HTTP / JSON (REST)\ntoken JWT
-controller ..> FE : TelasController\nentrega as telas
 
 controller ..> service
 controller ..> dto
@@ -69,10 +65,9 @@ exception ..> dto
 repository ..> DB : JPA / Hibernate
 
 note as MVC
-  MVC num único projeto:
-  View = telas React (src/main/frontend),
-  geradas no build e servidas pelo Spring Boot
-  Controller = pacote controller
+  MVC no back-end:
   Model = model + repository + service
+  Controller = controller
+  View = front-end React (consome a API)
 end note
 @enduml

@@ -34,15 +34,15 @@
   - [Pré-requisitos](#pré-requisitos)
   - [Variáveis de Ambiente](#-variáveis-de-ambiente)
   - [Banco de Dados (Supabase)](#-banco-de-dados-supabase)
+  - [Instalação de Dependências](#-instalação-de-dependências)
   - [Como Executar a Aplicação](#-como-executar-a-aplicação)
 - [Endpoints da API](#-endpoints-da-api)
 - [Estrutura de Pastas](#-estrutura-de-pastas)
 - [Demonstração](#-demonstração)
 - [Testes](#-testes)
 - [Documentações utilizadas](#-documentações-utilizadas)
-- [Autores](#-autores)
+- [Autor](#-autor)
 - [Agradecimentos](#-agradecimentos)
-- [Licença](#-licença)
 
 ---
 
@@ -59,7 +59,7 @@ Alugar um carro normalmente exige ir até a locadora, preencher papelada e esper
 - **O cliente** se cadastra, informa seus dados e rendimentos, escolhe o carro e as datas e acompanha o pedido numa trilha de status (enviado → análise financeira → aprovado → contrato assinado).
 - **O agente** (empresa ou banco) vê os pedidos enviados, faz a análise financeira, dá o parecer, pode modificar pedidos ainda não analisados e executa o contrato dos aprovados, definindo em nome de quem o carro fica registrado. Bancos ainda podem associar um contrato de crédito ao aluguel.
 
-O sistema só pode ser usado após cadastro e login. Tudo fica num **único projeto Spring Boot**, organizado nos dois subsistemas da especificação: a **gestão de pedidos e contratos** (API em `src/main/java`) e a **construção dinâmica das páginas web** (telas React em `src/main/frontend`), entregues juntas em um só endereço.
+O sistema só pode ser usado após cadastro e login. Ele é dividido em dois subsistemas, como pede a especificação: a **gestão de pedidos e contratos** (API Spring Boot) e a **construção dinâmica das páginas web** (React).
 
 ---
 
@@ -78,16 +78,16 @@ O sistema só pode ser usado após cadastro e login. Tudo fica num **único proj
 
 ## 🛠 Tecnologias Utilizadas
 
-### 💻 Telas (View)
+### 💻 Front-end
 
 * **Biblioteca:** React 18.3.1
 * **Roteamento:** React Router 6
 * **Linguagem:** JavaScript (ES2022+)
 * **Estilização:** CSS puro com variáveis (identidade visual própria)
 * **Gerenciamento de Estado:** Context API (sessão do usuário)
-* **Build Tool:** Vite 6, executado pelo Maven no build do projeto
+* **Build Tool:** Vite 6
 
-### 🖥️ API e persistência
+### 🖥️ Back-end
 
 * **Linguagem:** Java 25 (JDK 25)
 * **Framework:** Spring Boot 4.0.9 (Spring MVC)
@@ -101,15 +101,15 @@ O sistema só pode ser usado após cadastro e login. Tudo fica num **único proj
 
 ## 🏗 Arquitetura
 
-O VaptVupt é **um único projeto Spring Boot** que segue a arquitetura **MVC** e entrega, no mesmo endereço, as telas e a **API REST** em JSON que elas consomem:
+O sistema segue a arquitetura **MVC**, separada em front-end e back-end que conversam por uma **API REST** em JSON:
 
-- **View (`src/main/frontend`):** telas em React. No build, o Maven roda o Vite e coloca as telas prontas em `target/classes/static`, de onde o Spring Boot as serve. O `TelasController` devolve o `index.html` para as rotas do navegador (`/login`, `/pedidos`...). Dentro das telas, `pages` reúne as páginas, `components` os componentes reutilizáveis, `contexts` a sessão, e todas as chamadas HTTP ficam concentradas em `services`.
-- **Controller (`src/main/java/.../controller`):** recebe as requisições REST, valida a entrada (DTOs) e delega para os serviços.
+- **View (front-end React):** telas em `frontend/src/pages`, componentes reutilizáveis em `components`, sessão em `contexts` e todas as chamadas HTTP concentradas em `services`. As telas nunca chamam `fetch` diretamente.
+- **Controller (`backend/.../controller`):** recebe as requisições REST, valida a entrada (DTOs) e delega para os serviços.
 - **Model (`model`, `service`, `repository`):** entidades JPA com as regras de estado do pedido, serviços com as regras de negócio e permissões, e repositórios Spring Data que acessam o PostgreSQL do Supabase.
 
-Padrões adotados: **DTO** (os dados que entram e saem da API são separados das entidades), **Repository**, **Service Layer** e um **tratador global de exceções** que devolve sempre `{ "message": "..." }`, que as telas mostram ao usuário.
+Padrões adotados: **DTO** (os dados que entram e saem da API são separados das entidades), **Repository**, **Service Layer** e um **tratador global de exceções** que devolve sempre `{ "message": "..." }`, que o front-end mostra ao usuário.
 
-**Fluxo de autenticação:** o login devolve um token JWT assinado (HS256) com o id do usuário e o perfil (`CLIENTE` ou `AGENTE`). As telas enviam o token no cabeçalho `Authorization: Bearer` em toda requisição à API, e o Spring Security libera cada rota conforme o perfil.
+**Fluxo de autenticação:** o login devolve um token JWT assinado (HS256) com o id do usuário e o perfil (`CLIENTE` ou `AGENTE`). O front-end envia o token no cabeçalho `Authorization: Bearer` em toda requisição, e o Spring Security libera cada rota conforme o perfil.
 
 **Ciclo de vida do pedido:**
 
@@ -138,16 +138,18 @@ As fontes dos diagramas estão em PlantUML (`docs/diagramas/*.puml`), então dá
 
 ### Pré-requisitos
 
-* **Java JDK 25**
+* **Java JDK 25** (para o back-end)
+* **Node.js** LTS 18 ou superior, com npm (para o front-end)
 * **Conta no Supabase** com um projeto criado (banco de dados)
-* O Maven e o Node **não** precisam estar instalados: o projeto usa o Maven Wrapper (`mvnw`), e o Maven baixa o Node sozinho para gerar as telas.
-* Node.js LTS só é necessário se você quiser usar o modo de desenvolvimento das telas (`npm run dev`).
+* O Maven **não** precisa estar instalado: o projeto usa o Maven Wrapper (`mvnw`).
 
 ---
 
 ### 🔑 Variáveis de Ambiente
 
-Copie `.env.example` para `.env` **na raiz do projeto** e preencha. O Spring lê esse arquivo ao iniciar, e o Vite lê dele a variável das telas.
+#### 1 Back-end (Spring Boot)
+
+Copie `backend/.env.example` para `backend/.env` e preencha. O Spring lê esse arquivo automaticamente ao iniciar.
 
 | Variável | Descrição | Exemplo |
 | :--- | :--- | :--- |
@@ -155,8 +157,17 @@ Copie `.env.example` para `.env` **na raiz do projeto** e preencha. O Spring lê
 | `SUPABASE_DB_USER` | Usuário do pooler. | `postgres.abcdefghijklmnop` |
 | `SUPABASE_DB_PASSWORD` | Senha do banco definida ao criar o projeto. | `senha-do-banco` |
 | `JWT_SECRET` | Segredo para assinar os tokens de login (mínimo 32 caracteres). | `um-texto-aleatorio-bem-grande-1234567890` |
-| `VITE_USE_MOCK` | `false` (padrão) usa a API; `true` faz as telas usarem dados simulados no navegador. | `false` |
-| `SERVER_PORT` | Porta do sistema (opcional). | `8080` |
+| `SERVER_PORT` | Porta da API (opcional). | `8080` |
+
+#### 2 Front-end (React, Vite)
+
+Opcional. Crie `frontend/.env` a partir de `frontend/.env.example`.
+
+| Variável | Descrição | Exemplo |
+| :--- | :--- | :--- |
+| `VITE_USE_MOCK` | `false` (padrão) usa a API Spring Boot; `true` usa dados simulados no navegador, sem back-end. | `false` |
+
+Em desenvolvimento, o Vite repassa tudo que começa com `/api` para `http://localhost:8080`, então não é preciso configurar a URL da API.
 
 ---
 
@@ -164,7 +175,7 @@ Copie `.env.example` para `.env` **na raiz do projeto** e preencha. O Spring lê
 
 1. Crie um projeto em [supabase.com](https://supabase.com) e guarde a senha do banco.
 2. No painel do projeto, clique em **Connect** → **Connection String** → **Type: JDBC** → **Method: Session pooler**.
-3. A string tem o formato `jdbc:postgresql://HOST:5432/postgres?user=USUARIO&password=[YOUR-PASSWORD]`. Separe as partes no `.env`:
+3. A string tem o formato `jdbc:postgresql://HOST:5432/postgres?user=USUARIO&password=[YOUR-PASSWORD]`. Separe as partes no `backend/.env`:
    - `SUPABASE_DB_URL` = `jdbc:postgresql://HOST:5432/postgres?sslmode=require`
    - `SUPABASE_DB_USER` = o valor de `user`
    - `SUPABASE_DB_PASSWORD` = a senha do banco
@@ -175,16 +186,50 @@ Copie `.env.example` para `.env` **na raiz do projeto** e preencha. O Spring lê
 
 ---
 
-### ⚡ Como Executar a Aplicação
+### 📦 Instalação de Dependências
 
 ```bash
 git clone <URL_DO_REPOSITÓRIO>
 cd Sistema-Aluguel-de-Carros
-./mvnw spring-boot:run      # Windows (PowerShell): .\mvnw spring-boot:run
 ```
 
-Esse único comando baixa as dependências, gera as telas React e sobe o sistema inteiro.
-🚀 *Acesse **http://localhost:8080**.*
+#### Front-end (React)
+
+```bash
+cd frontend
+npm install
+cd ..
+```
+
+#### Back-end (Spring Boot)
+
+```bash
+cd backend
+./mvnw clean install      # Windows (PowerShell): .\mvnw clean install
+cd ..
+```
+
+---
+
+### ⚡ Como Executar a Aplicação
+
+Use **dois terminais**.
+
+#### Terminal 1: Back-end (Spring Boot)
+
+```bash
+cd backend
+./mvnw spring-boot:run    # Windows (PowerShell): .\mvnw spring-boot:run
+```
+🚀 *A API fica disponível em **http://localhost:8080**.*
+
+#### Terminal 2: Front-end (React, Vite)
+
+```bash
+cd frontend
+npm run dev
+```
+🎨 *O sistema fica disponível em **http://localhost:5173**.*
 
 **Usuários de teste** (criados automaticamente):
 
@@ -193,25 +238,8 @@ Esse único comando baixa as dependências, gera as telas React e sobe o sistema
 | Cliente | `cliente` | `123` |
 | Agente (banco) | `agente` | `123` |
 
-#### Modo de desenvolvimento das telas (opcional)
-
-Para mexer nas telas com recarregamento instantâneo, deixe o sistema rodando e, em outro terminal:
-
-```bash
-npm install
-npm run dev
-```
-🎨 *As telas ficam em **http://localhost:5173**, e as chamadas à API vão para o sistema na porta 8080.*
-
 > [!NOTE]
-> Para ver as telas sem banco de dados, use `VITE_USE_MOCK=true` no `.env` e rode só o `npm run dev`. Os dados ficam salvos no navegador.
-
-#### Gerar o arquivo para produção
-
-```bash
-./mvnw clean package
-java -jar target/vaptvupt-1.0.0.jar
-```
+> Para ver as telas sem o back-end, rode o front-end com `VITE_USE_MOCK=true` no `frontend/.env`. Os dados ficam salvos no navegador.
 
 ---
 
@@ -250,7 +278,7 @@ Saída esperada (resumida):
 ```json
 {
   "token": "eyJhbGciOiJIUzI1NiJ9...",
-  "usuario": { "id": 2, "tipo": "CLIENTE", "nome": "Ana Souza", "login": "cliente" }
+  "usuario": { "id": 2, "tipo": "CLIENTE", "nome": "Cliente", "login": "cliente" }
 }
 ```
 
@@ -261,37 +289,38 @@ Saída esperada (resumida):
 ```
 .
 ├── README.md
-├── .env                   # 🧩 Variáveis do Supabase, JWT e das telas
-├── .gitignore / .gitattributes
-├── pom.xml                          # 🛠️ Build Maven (inclui a geração das telas)
-├── mvnw / mvnw.cmd / .mvn/          # ⚙️ Maven Wrapper
-├── package.json                     # 📦 Dependências das telas (React, Vite)
-├── vite.config.js                   # ⚡ Build das telas → target/classes/static
-├── index.html                       # 🌐 Página base das telas
-├── public/                          # 🖼️ Favicon
+├── .gitignore
 │
-├── src/main/
-│   ├── frontend/                    # 🎨 Telas React (View)
-│   │   ├── assets/                  # 🖼️ Logo
-│   │   ├── components/              # 🧱 Layout, formulários, placa, trilha de status
-│   │   ├── contexts/                # 🔐 AuthContext (sessão)
-│   │   ├── pages/                   # 📄 Login, Cadastro, Meus pedidos, Novo pedido, Perfil
-│   │   │   └── agente/              # 🧾 Painel do agente
-│   │   ├── services/                # 🔌 Chamadas à API + mockApi (modo simulado)
-│   │   ├── styles/                  # 🎨 global.css
-│   │   └── utils/                   # 🛠️ Formatação (data, CPF)
-│   │
-│   ├── java/com/vaptvupt/
-│   │   ├── controller/              # 🎮 Endpoints REST e entrega das telas
-│   │   ├── service/                 # ⚙️ Regras de negócio
-│   │   ├── repository/              # 🗄️ Repositórios Spring Data JPA
-│   │   ├── model/                   # 🧬 Entidades (Usuario, Cliente, Agente, Pedido, Contrato...)
-│   │   ├── dto/                     # ✉️ Objetos de entrada e saída da API
-│   │   ├── config/                  # 🛡️ Segurança (JWT) e dados iniciais
-│   │   └── exception/               # 💥 Exceções e tratador global
-│   │
-│   └── resources/
-│       └── application.properties   # ⚙️ Configuração do Spring Boot
+├── frontend/                        # 📁 Aplicação React + Vite (View)
+│   ├── .env.example                 # 🧩 VITE_USE_MOCK
+│   ├── index.html
+│   ├── vite.config.js               # 🔀 Proxy /api → localhost:8080
+│   ├── public/                      # 🖼️ Favicon
+│   └── src/
+│       ├── assets/                  # 🖼️ Logo
+│       ├── components/              # 🧱 Layout, formulários, placa, trilha de status
+│       ├── contexts/                # 🔐 AuthContext (sessão)
+│       ├── pages/                   # 📄 Login, Cadastro, Meus pedidos, Novo pedido, Perfil
+│       │   └── agente/              # 🧾 Painel do agente
+│       ├── services/                # 🔌 Chamadas à API + mockApi (modo simulado)
+│       ├── styles/                  # 🎨 global.css
+│       └── utils/                   # 🛠️ Formatação (data, CPF)
+│
+├── backend/                         # 📁 API Spring Boot
+│   ├── .env.example                 # 🧩 Conexão com o Supabase e JWT
+│   ├── pom.xml
+│   ├── mvnw / mvnw.cmd              # ⚙️ Maven Wrapper
+│   └── src/main/
+│       ├── java/com/vaptvupt/
+│       │   ├── controller/          # 🎮 Endpoints REST
+│       │   ├── service/             # ⚙️ Regras de negócio
+│       │   ├── repository/          # 🗄️ Repositórios Spring Data JPA
+│       │   ├── model/               # 🧬 Entidades (Usuario, Cliente, Agente, Pedido, Contrato...)
+│       │   ├── dto/                 # ✉️ Objetos de entrada e saída da API
+│       │   ├── config/              # 🛡️ Segurança (JWT) e dados iniciais
+│       │   └── exception/           # 💥 Exceções e tratador global
+│       └── resources/
+│           └── application.properties
 │
 └── docs/                            # 📚 Documentação
     ├── historias-de-usuario.md
@@ -320,7 +349,7 @@ Saída esperada (resumida):
 
 O projeto não tem testes automatizados. A validação foi feita manualmente, seguindo os critérios de aceitação das [histórias de usuário](docs/historias-de-usuario.md). Roteiro rápido:
 
-1. Rode `.\mvnw spring-boot:run`, abra http://localhost:8080, entre como `cliente`, faça um pedido e confira o status "Aguardando análise".
+1. Entre como `cliente`, faça um pedido e confira o status "Aguardando análise".
 2. Entre como `agente`, altere e aprove o pedido; em "Aguardando contrato", execute o contrato.
 3. Volte como `cliente` e confira a trilha completa, o parecer e os dados do contrato.
 4. Crie um cliente novo, altere os dados em "Meus dados" e exclua a conta.
@@ -352,4 +381,3 @@ O projeto não tem testes automatizados. A validação foi feita manualmente, se
 * [**Engenharia de Software PUC Minas**](https://www.instagram.com/engsoftwarepucminas/) - Pelo apoio institucional e pela estrutura acadêmica.
 * [**Prof. Dr. João Paulo Aramuni**](https://github.com/joaopauloaramuni) - Pela orientação na disciplina e pelos ensinamentos sobre **Arquitetura de Software**.
 
----
